@@ -4,6 +4,7 @@ import de.hpi.isg.mdms.domain.constraints.PartialFunctionalDependency;
 import de.hpi.isg.mdms.model.targets.Table;
 import de.hpi.isg.mdms.model.util.IdUtils;
 import de.metanome.algorithm_integration.results.FunctionalDependency;
+import de.metanome.algorithm_integration.results.RelaxedFunctionalDependency;
 
 import java.util.Comparator;
 
@@ -50,7 +51,7 @@ public class PartialFD {
     }
 
     /**
-     * Convert this instance into a {@link FunctionalDependency}.
+     * Convert this instance into a {@link de.metanome.algorithm_integration.results.FunctionalDependency}.
      *
      * @return the converted instance
      */
@@ -58,6 +59,14 @@ public class PartialFD {
         return new FunctionalDependency(
                 this.lhs.toMetanomeColumnCombination(),
                 this.rhs.toMetanomeColumnIdentifier()
+        );
+    }
+
+    public RelaxedFunctionalDependency toMetanomeReFunctionalDependency() {
+        return new RelaxedFunctionalDependency(
+                this.lhs.toMetanomeColumnCombination(),
+                this.rhs.toMetanomeColumnIdentifier(),
+                score
         );
     }
 

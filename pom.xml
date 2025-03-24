@@ -17,7 +17,7 @@
     </modules>
 
     <properties>
-        <metanome.version>1.1-SNAPSHOT</metanome.version>
+        <metanome.version>1.2-SNAPSHOT</metanome.version>
         <metacrate.version>0.0.3-SNAPSHOT</metacrate.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -116,7 +116,7 @@
             <dependency>
                 <groupId>de.metanome</groupId>
                 <artifactId>metanome-cli</artifactId>
-                <version>1.1.1-SNAPSHOT</version>
+                <version>${metanome.version}</version>
             </dependency>
 
             <!-- Metacrate -->

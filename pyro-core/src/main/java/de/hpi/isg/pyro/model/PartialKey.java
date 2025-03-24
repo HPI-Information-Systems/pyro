@@ -4,6 +4,7 @@ import de.hpi.isg.mdms.domain.constraints.PartialUniqueColumnCombination;
 import de.hpi.isg.mdms.model.targets.Table;
 import de.hpi.isg.mdms.model.util.IdUtils;
 import de.metanome.algorithm_integration.results.UniqueColumnCombination;
+import de.metanome.algorithm_integration.results.RelaxedUniqueColumnCombination;
 
 import java.util.Comparator;
 
@@ -44,6 +45,10 @@ public class PartialKey {
      */
     public UniqueColumnCombination toMetanomeUniqueColumnCobination() {
         return new UniqueColumnCombination(this.vertical.toMetanomeColumnCombination());
+    }
+
+    public RelaxedUniqueColumnCombination toMetanomeRelaxedUniqueColumnCobination() {
+        return new RelaxedUniqueColumnCombination(this.vertical.toMetanomeColumnCombination(), this.score);
     }
 
     /**

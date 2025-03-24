@@ -15,14 +15,20 @@ import de.hpi.isg.pyro.util.Parallel;
 import de.hpi.isg.pyro.util.User;
 import de.metanome.algorithm_integration.AlgorithmConfigurationException;
 import de.metanome.algorithm_integration.AlgorithmExecutionException;
-import de.metanome.algorithm_integration.algorithm_types.*;
+import de.metanome.algorithm_integration.algorithm_types.BooleanParameterAlgorithm;
+import de.metanome.algorithm_integration.algorithm_types.IntegerParameterAlgorithm;
+import de.metanome.algorithm_integration.algorithm_types.RelationalInputParameterAlgorithm;
+import de.metanome.algorithm_integration.algorithm_types.RelaxedFunctionalDependencyAlgorithm;
+import de.metanome.algorithm_integration.algorithm_types.RelaxedUniqueColumnCombinationAlgorithm;
+import de.metanome.algorithm_integration.algorithm_types.RelaxedUniqueColumnCombinationAlgorithm;
+import de.metanome.algorithm_integration.algorithm_types.StringParameterAlgorithm;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirement;
 import de.metanome.algorithm_integration.configuration.ConfigurationRequirementFileInput;
 import de.metanome.algorithm_integration.input.RelationalInputGenerator;
 import de.metanome.algorithm_integration.result_receiver.ColumnNameMismatchException;
 import de.metanome.algorithm_integration.result_receiver.CouldNotReceiveResultException;
-import de.metanome.algorithm_integration.result_receiver.FunctionalDependencyResultReceiver;
-import de.metanome.algorithm_integration.result_receiver.UniqueColumnCombinationResultReceiver;
+import de.metanome.algorithm_integration.result_receiver.RelaxedFunctionalDependencyResultReceiver;
+import de.metanome.algorithm_integration.result_receiver.RelaxedUniqueColumnCombinationResultReceiver;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.slf4j.Logger;
@@ -40,7 +46,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class Pyro
         extends DependencyConsumer
-        implements FunctionalDependencyAlgorithm, UniqueColumnCombinationsAlgorithm,
+        implements RelaxedFunctionalDependencyAlgorithm, RelaxedUniqueColumnCombinationAlgorithm,
         StringParameterAlgorithm, IntegerParameterAlgorithm, RelationalInputParameterAlgorithm, BooleanParameterAlgorithm,
         MetacrateClient {
 
@@ -137,11 +143,11 @@ public class Pyro
                 for (Column rhs : schema.getColumns()) {
 
                     DependencyStrategy strategy;
-                    switch (configuration.uccErrorMeasure) {
+                    switch (configuration.fdErrorMeasure) {
                         case "g1prime":
                             strategy = new FdG1Strategy(
                                     rhs,
-                                    configuration.maxUccError,
+                                    configuration.maxFdError,
                                     configuration.errorDev
                             );
                             break;
@@ -253,13 +259,13 @@ public class Pyro
     }
 
     @Override
-    public void setResultReceiver(FunctionalDependencyResultReceiver resultReceiver) {
+    public void setResultReceiver(RelaxedFunctionalDependencyResultReceiver resultReceiver) {
         if (this.metadataStore != null) return;
 
         this.fdConsumer = partialFD -> {
             try {
                 synchronized (resultReceiver) {
-                    resultReceiver.receiveResult(partialFD.toMetanomeFunctionalDependency());
+                    resultReceiver.receiveResult(partialFD.toMetanomeReFunctionalDependency());
                 }
             } catch (CouldNotReceiveResultException | ColumnNameMismatchException e) {
                 throw new RuntimeException(String.format("Could not receive %s.", partialFD), e);
@@ -268,13 +274,13 @@ public class Pyro
     }
 
     @Override
-    public void setResultReceiver(UniqueColumnCombinationResultReceiver resultReceiver) {
+    public void setResultReceiver(RelaxedUniqueColumnCombinationResultReceiver resultReceiver) {
         if (this.metadataStore != null) return;
 
         this.uccConsumer = partialKey -> {
             try {
                 synchronized (resultReceiver) {
-                    resultReceiver.receiveResult(partialKey.toMetanomeUniqueColumnCobination());
+                    resultReceiver.receiveResult(partialKey.toMetanomeRelaxedUniqueColumnCobination());
                 }
             } catch (CouldNotReceiveResultException | ColumnNameMismatchException e) {
                 throw new RuntimeException(String.format("Could not receive %s.", partialKey), e);
